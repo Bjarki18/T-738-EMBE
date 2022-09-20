@@ -62,7 +62,7 @@ int Fifo::circular_get()
 void Fifo::circular_put(int item)
 {   
     *tail = item;
-    if(counter < 5){
+    if(counter < FIFO_SIZE){
         counter++;
     }
     if (tail == head && init != 0){
