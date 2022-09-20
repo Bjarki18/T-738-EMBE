@@ -82,28 +82,28 @@ void test_overwrite(void){
 void circular_test_reset(void){
     // 1 Setup
     Fifo f;
-    f.put(1);
-    f.put(2);
-    f.get();
-    f.put(3);
-    f.reset();
+    f.circular_put(1);
+    f.circular_put(2);
+    f.circular_get();
+    f.circular_put(3);
+    f.circular_reset();
 
     // 2-3 Execute and validate
-    TEST_ASSERT_TRUE(f.is_empty());
+    TEST_ASSERT_TRUE(f.circular_is_empty());
 }
 
 void circular_test_normal_flow(void)
 {
     // 1 Setup
     Fifo f;
-    f.put(1);
-    f.put(2);
-    f.get();
-    f.put(3);
+    f.circular_put(1);
+    f.circular_put(2);
+    f.circular_get();
+    f.circular_put(3);
 
     // 2-3 Execute and validate
-    TEST_ASSERT_EQUAL(2, f.get());
-    TEST_ASSERT_EQUAL(3, f.get());
+    TEST_ASSERT_EQUAL(2, f.circular_get());
+    TEST_ASSERT_EQUAL(3, f.circular_get());
 
     // 4 Cleanup
 }
@@ -111,13 +111,13 @@ void circular_test_normal_flow(void)
 void circular_test_underflow(void){
     // 1 Setup
     Fifo f;
-    f.put(1);
-    f.put(2);
-    f.get();
-    f.get();
+    f.circular_put(1);
+    f.circular_put(2);
+    f.circular_get();
+    f.circular_get();
 
     // 2-3 Execute and validate
-    TEST_ASSERT_TRUE(f.is_empty());
+    TEST_ASSERT_TRUE(f.circular_is_empty());
 
     // 4 Cleanup
 }
@@ -125,30 +125,30 @@ void circular_test_underflow(void){
 void circular_test_overflow(void){
     // 1 Setup
     Fifo f;
-    f.put(1);
-    f.put(2);
-    f.put(3);
-    f.put(4);
-    f.put(5);
+    f.circular_put(1);
+    f.circular_put(2);
+    f.circular_put(3);
+    f.circular_put(4);
+    f.circular_put(5);
     
 
     // 2-3 Execute and validate
-    TEST_ASSERT_TRUE(f.is_full());
+    TEST_ASSERT_TRUE(f.circular_is_full());
 }
 
 void circular_test_overwrite(void){
     // 1 Setup
     Fifo f;
-    f.put(1);
-    f.put(2);
-    f.put(3);
-    f.put(4);
-    f.put(5);
-    f.put(6);
+    f.circular_put(1);
+    f.circular_put(2);
+    f.circular_put(3);
+    f.circular_put(4);
+    f.circular_put(5);
+    f.circular_put(6);
     
 
     // 2-3 Execute and validate
-    TEST_ASSERT_EQUAL(2,f.get());
+    TEST_ASSERT_EQUAL(2,f.circular_get());
 }
 
 

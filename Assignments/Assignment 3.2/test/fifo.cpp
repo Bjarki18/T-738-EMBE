@@ -93,6 +93,7 @@ bool Fifo::circular_is_full()
 void Fifo::circular_reset()
 {
     memset(buffer,0,FIFO_SIZE);
+    counter = 0;
     head = buffer;
     tail = buffer;
     init = 0;
