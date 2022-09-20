@@ -1,0 +1,18 @@
+@startuml states
+hide empty description
+
+
+red -d-> green : go
+red --> red : stop
+
+
+green --> yellow : stop
+green --> green : go
+
+
+yellow --> red : Timeout
+yellow --> yellow :  stop
+yellow --> yellow :  go
+
+
+@enduml
