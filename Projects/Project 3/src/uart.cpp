@@ -9,7 +9,7 @@ void Uart::Init_Uart()
 	// 57600 baudrate
 	UBRR0H = 0;
 	UBRR0L = 16;
-	UCSR0B = (1<<RXEN0) |(1<<TXEN0);
+	UCSR0B = (1<<RXEN0) |(1<<TXEN0)|(1<<RXCIE0);
 	UCSR0C = (1<<USBS0) |(3<<UCSZ00);
 	indx = len = 0;
 }
@@ -91,6 +91,9 @@ void Uart::send_uart_int(int value){
 
 void Uart::send_uart_str(char s[]){
 	UART_load_string_in_TxBuffer(s); // load encoder value to transmit
+	// TxBuffer[len] = '\r';
+	// TxBuffer[len+1] = '\n';
+	// len += 2;
 	UART_transmit_TxBuffer(); // transmit encoder value over UART
 	reset_TxBuffer(); // reset transmit buffer
 }

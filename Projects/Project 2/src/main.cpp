@@ -60,12 +60,13 @@ int main(){
 	motor_m2.init();
 	int pwm = 0;
 	float target_speed = 600; 
-	motor_m1.set_lo();
-	motor_m2.set_hi();
+	motor_m1.set_hi();
+	motor_m2.set_lo();
 
 	while (1){
 		
 		OCR0B = controller.update(target_speed, encoder.speed());
+		// OCR0B = 243;
 		pwm = (1 - (OCR0A - OCR0B)/(OCR0A*1.0)) * 100;
 		
 		if (interval % 50 == 0){

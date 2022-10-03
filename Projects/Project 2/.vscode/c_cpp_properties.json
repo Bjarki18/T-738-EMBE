@@ -8,8 +8,8 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "c:/Users/bjark/OneDrive/HR/HR 9 - önn/Embedded Systems/Projects/Project 2/include",
-                "c:/Users/bjark/OneDrive/HR/HR 9 - önn/Embedded Systems/Projects/Project 2/src",
+                "c:/Users/bjark/OneDrive/HR/HR 9 - önn/Embedded Systems/git repo/Projects/Project 2/include",
+                "c:/Users/bjark/OneDrive/HR/HR 9 - önn/Embedded Systems/git repo/Projects/Project 2/src",
                 "C:/Users/bjark/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/bjark/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
                 "C:/Users/bjark/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
@@ -22,8 +22,8 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "c:/Users/bjark/OneDrive/HR/HR 9 - önn/Embedded Systems/Projects/Project 2/include",
-                    "c:/Users/bjark/OneDrive/HR/HR 9 - önn/Embedded Systems/Projects/Project 2/src",
+                    "c:/Users/bjark/OneDrive/HR/HR 9 - önn/Embedded Systems/git repo/Projects/Project 2/include",
+                    "c:/Users/bjark/OneDrive/HR/HR 9 - önn/Embedded Systems/git repo/Projects/Project 2/src",
                     "C:/Users/bjark/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/bjark/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
                     "C:/Users/bjark/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
