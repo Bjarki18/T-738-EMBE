@@ -1,0 +1,8 @@
+@startuml Part_1 
+[*] --> Initialization
+Initialization --> Pre_operational : Boot-up
+Pre_operational --> Initialization : Reset
+Operational --> Initialization : Reset
+Pre_operational --> Operational : set operational
+
+@enduml
