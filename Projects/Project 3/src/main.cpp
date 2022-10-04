@@ -103,7 +103,7 @@ ISR (USART_RX_vect)
 	}
 
 	if (command == 'c'){
-		PI_controller controller(0.01,2.5);
+		PI_controller controller(1.0, 0.064);
 	}
 }
 
