@@ -42,11 +42,11 @@ void Encoder::set_speed(){
 void Encoder::timer_msec(int period_ms){
     // this code sets up timer1 for a 1ms @ 16Mhz Clock (mode 4)
     // Counting 16000/8 cycles of a clock prescaled by 8
-    TCCR1A = 0; // set timer1 to normal operation (all bits in control registers A and B set to zero)
-    TCCR1B = 0;
-    TCNT1 = 0; // initialize counter value to 0
-    OCR1A = (period_ms * 16000.0/1024 - 1); // assign target count to compare register A (must be less than 65536)
-    TCCR1B |= (1 << WGM12); // clear the timer on compare match A
-    TIMSK1 |= (1 << OCIE1A); // set interrupt on compare match A
-    TCCR1B |= (1 << CS12) | (1 << CS10); // set prescaler to 1024 and start the timer
+    TCCR2A = 0; // set timer1 to normal operation (all bits in control registers A and B set to zero)
+    TCCR2B = 0;
+    TCNT2 = 0; // initialize counter value to 0
+    OCR2A = (period_ms * 16000.0/1024 - 1); // assign target count to compare register A (must be less than 256)
+    TCCR2A |= (1 << WGM21); // clear the timer on compare match A
+    TIMSK2 |= (1 << OCIE2A); // set interrupt on compare match A
+    TCCR2B |= (1 << CS22) | (1 << CS21) | (1 << CS20); // set prescaler to 1024 and start the timer
 }

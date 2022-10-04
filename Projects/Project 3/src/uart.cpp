@@ -92,6 +92,9 @@ void Uart::send_uart_int(int value){
 
 void Uart::send_uart_str(char s[]){
 	UART_load_string_in_TxBuffer(s); // load encoder value to transmit
+	// TxBuffer[len] = '\r';
+	// TxBuffer[len+1] = '\n';
+	// len += 2;
 	UART_transmit_TxBuffer(); // transmit encoder value over UART
 	reset_TxBuffer(); // reset transmit buffer
 }

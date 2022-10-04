@@ -10,4 +10,8 @@ STOP --> Operational: Fault fixed
 Pre_operational --> STOP : FAULT
 STOP --> Pre_operational : Fault fixed
 STOP --> Initialization : RESET
+Pre_operational: motor_m1.set_hi();
+Pre_operational: motor_m2.set_lo();
+STOP: motor_m1.set_hi();
+STOP: motor_m2.set_hi();
 @enduml
