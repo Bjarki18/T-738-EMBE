@@ -6,18 +6,23 @@
 #include <sys/types.h>
 #include <stdlib.h>
 
-int fd;
-float encoder_pulses = 0;
+
 // https://pubs.opengroup.org/onlinepubs/000095399/functions/read.html
-char buff[5];
 char c[20];
 size_t nbytes;
 ssize_t readBytes;
-float sum = 0;
-float the_pwm = 0.0;
-float max_speed = 1400;
-float scaler = 100000;
+
+int fd;
+float encoder_pulses = 0;
+char buff[5];
 float error = 0.0;
+float the_pwm = 0.0;
+float scaler = 100000;
+float sum = 0.0;
+float value = 0.0;
+float integral = 0.0;
+
+
 //PI controller values
 float K_p =  0.001;
 float t_i = 2.7;
@@ -25,16 +30,15 @@ float t = 0.9;
 
 
 int update(float ref, float actual) {
-
+    
     error = ref - actual*10;
-    float value = sum + (error * t);
+    value = sum + (error * t);
     if(actual > 1 ){
         sum = value;
     }
-    float integral = (sum/t_i);
-
+    integral = (sum/t_i);
+    //PWM range from 00000 up to 99999 (max is 100000), because period set at 100000.
     the_pwm = (K_p * (error + integral)) * scaler;
-
 
     if(the_pwm > scaler-1)
     {
@@ -88,7 +92,6 @@ void initialize_pwm_and_motor()
     write(fd, "16", 2);
     close(fd);
 
-
     //Set gpio26 as output
     fd = open("/sys/class/gpio/gpio26/direction", O_WRONLY);
     write(fd, "out", 3);
@@ -127,10 +130,10 @@ void unexport()
 int main()
 {
         initialize_pwm_and_motor();
-    int previousEncoder = 0;
-    int current_pwm = 0;
-    int speed = 0;
     int ref_speed = 700;
+    int previousEncoder = 0;
+    int speed = 0;
+    int current_pwm = 0;
     int modifier_encounter_val = 0;
     
     for(int i = 0; i < 100000; i++)
