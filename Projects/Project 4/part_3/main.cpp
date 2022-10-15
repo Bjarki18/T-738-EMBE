@@ -1,11 +1,8 @@
 #include <unistd.h>
 #include <fcntl.h>
-#include <poll.h>
+// #include <poll.h>
 #include <stdio.h>
-#include <time.h>
-#include <sys/types.h>
 #include <stdlib.h>
-
 
 // https://pubs.opengroup.org/onlinepubs/000095399/functions/read.html
 char c[20];
@@ -22,11 +19,11 @@ float sum = 0.0;
 float value = 0.0;
 float integral = 0.0;
 
-
 //PI controller values
 float K_p =  0.001;
 float t_i = 2.7;
 float t = 0.9;
+
 
 
 int update(float ref, float actual) {
@@ -110,6 +107,7 @@ void initialize_pwm_and_motor()
     write(fd,"01",2);
     close(fd);
 }
+
 
 void unexport()
 {
