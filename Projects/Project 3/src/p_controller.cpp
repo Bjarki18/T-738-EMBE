@@ -25,8 +25,8 @@ void P_controller::update_i(int ti) {
 }
 
 void P_controller::brake(){
-    motor_m1.set_lo();
-    motor_m2.set_lo();
+    motor_m1.set_hi();
+    motor_m2.set_hi();
 }
 
 void P_controller::go(){

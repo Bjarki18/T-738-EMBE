@@ -9,6 +9,7 @@ void Uart::Init_Uart()
 	// 57600 baudrate
 	UBRR0H = 0;
 	UBRR0L = 16;
+	// UCSR0B = (1<<RXEN0) |(1<<TXEN0);
 	UCSR0B = (1<<RXEN0) |(1<<TXEN0)|(1<<RXCIE0);
 	UCSR0C = (1<<USBS0) |(3<<UCSZ00);
 	indx = len = 0;

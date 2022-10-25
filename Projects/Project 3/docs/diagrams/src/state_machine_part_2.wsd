@@ -1,0 +1,17 @@
+@startuml Part_1 
+[*] --> Initialization
+Initialization --> Pre_operational : Boot-up
+Pre_operational --> Initialization : RESET
+Operational --> Initialization : RESET
+Pre_operational --> Operational : set operational
+Operational --> Pre_operational : set operational
+Operational --> STOP : FAULT
+STOP --> Operational: Fault fixed
+Pre_operational --> STOP : FAULT
+STOP --> Pre_operational : Fault fixed
+STOP --> Initialization : RESET
+Pre_operational: motor_m1.set_hi();
+Pre_operational: motor_m2.set_lo();
+STOP: motor_m1.set_hi();
+STOP: motor_m2.set_hi();
+@enduml

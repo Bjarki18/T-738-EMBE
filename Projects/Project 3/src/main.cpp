@@ -24,7 +24,8 @@ Digital_out LED(DDD7);
 Digital_in_b btn_stop(DDB0);
 Encoder encoder(10);
 // P_controller controller(0.01);
-PI_controller controller(0.25, 1);
+PI_controller controller(1.0, 0.064);
+// PI_controller controller(2.7, 0.064);
 Timer0_ms timer0;
 Timer1_ms timer1;
 Uart uart;
@@ -86,7 +87,7 @@ ISR (USART_RX_vect)
 			controller.update_p(command - 47);	// scale 0-4 ascii to 1-5 int
 		}
 		else if (command >= 53 && command <= 57){ // 5-9 numpad
-			controller.update_i(command - (48+5)); //scale 5-9 ascii (53-57) down to 0-4 int
+			controller.update_i(command - (49+5)); //scale 5-9 ascii (53-57) down to 1-5 int
 			
 		}else{
     		state = command;
@@ -102,7 +103,7 @@ ISR (USART_RX_vect)
 	}
 
 	if (command == 'c'){
-		PI_controller controller(0.01,2.5);
+		PI_controller controller(1.0, 0.064);
 	}
 }
 
