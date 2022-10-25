@@ -110,7 +110,7 @@ private:
     double k_p;
     double t_i;
     double sum = 0;
-    double t = 0.006;
+    double t = 0.004;
 };
 
 

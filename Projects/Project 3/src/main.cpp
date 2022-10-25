@@ -24,7 +24,7 @@ Digital_out LED(DDD7);
 Digital_in_b btn_stop(DDB0);
 Encoder encoder(10);
 // P_controller controller(0.01);
-PI_controller controller(0.01, 0.5);
+PI_controller controller(0.25, 1);
 Timer0_ms timer0;
 Timer1_ms timer1;
 Uart uart;
