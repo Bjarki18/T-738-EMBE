@@ -48,13 +48,15 @@ void loop() {
     uint16_t regis = ((command[2] << 8) + command[3]);
     uint16_t data = ((command[4] << 8) + command[5]);
     uint16_t crc = ((command[6] << 8) + command[7]);
-    
+    uint16_t crc_comapre = ModRTU_CRC(command,6);
 
-    if (server_num == server){
-      analogWrite(ledPin, 255);       // yes, write out
-      Serial.write(command,8);               // send the buffer to the RPi
-    }else{
-      analogWrite(ledPin, 0);       // yes, write out
+    if (crc = crc_comapre){
+      if (server_num == server){
+        analogWrite(ledPin, 255);       // yes, write out
+        Serial.write(command,8);               // send the buffer to the RPi
+      }else{
+        analogWrite(ledPin, 0);       // yes, write out
+      }
     }
   } 
 }
