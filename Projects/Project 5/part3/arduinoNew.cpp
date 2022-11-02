@@ -30,7 +30,7 @@ motor_m2.init();
 volatile int posi = 0;
 
 int ledPin = 11;          // LED with PWM brightness control
-uint8_t server_num = 1;
+uint8_t server_num = 0;
 uint16_t registers[100];
 int ThermistorPin = A0;
 uint8_t lastState = 0;
