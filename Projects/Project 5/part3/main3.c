@@ -6,8 +6,20 @@
 #include<stdint.h>
 #include<stdlib.h>
 
+#define COMMAND_LEN 8
+
+// int file,count;
+uint8_t command[COMMAND_LEN];
+uint8_t receive[COMMAND_LEN];
 uint16_t lastServo0 = 0;
 uint16_t lastServo1 = 0;
+
+
+
+
+
+
+
 
 // Compute the MODBUS RTU CRC
 uint16_t ModRTU_CRC(uint8_t buf[], int len)
@@ -28,20 +40,58 @@ uint16_t ModRTU_CRC(uint8_t buf[], int len)
     return crc;
 }
 
+void Preop(uint8_t servernum){
+    command[0] = servernum;
+    command[1] = 0x06;
+    command[2] = 0x00;
+    command[3] = 0x00;
+    command[4] = 0x00;
+    command[5] = 0x80;
+    uint16_t crc = ModRTU_CRC(command,6);
+    command[6] = (crc >>8);
+    command[7] = (crc);
+    // Send();
+}
 
+void Op(uint8_t servernum){
+    command[0] = servernum;
+    command[1] = 0x06;
+    command[2] = 0x00;
+    command[3] = 0x00;
+    command[4] = 0x00;
+    command[5] = 0x01;
+    uint16_t crc = ModRTU_CRC(command,6);
+    command[6] = (crc >>8);
+    command[7] = (crc);
+    // Send();
+}
 
-int main(int argc, char *argv[]){
-   int file,count;
-    if(argc!=5){
-        printf("Invalid number of arguments, exiting!\n");
-        return -2;
-    }
+void Read( uint8_t servernum){
+    command[0] = servernum;
+    command[1] = 0x03;
+    command[2] = 0x00;
+    command[3] = 0x06;
+    command[4] = 0x00;
+    command[5] = 0x01;
+    uint16_t crc = ModRTU_CRC(command,6);
+    command[6] = (crc >>8);
+    command[7] = (crc);
+    // Send();
+}
 
-    if ((file = open("/dev/ttyS0", O_RDWR | O_NOCTTY ))<0){
-        perror("UART: Failed to open the file.\n");
-        return -1;
-    }
+void Write(uint8_t servernum, uint16_t regisnumb, uint8_t data1, uint8_t data2){
+    command[0] = servernum;
+    command[1] = 0x06;
+    command[2] = regisnumb >> 8;
+    command[3] = regisnumb;
+    command[4] = data1;
+    command[5] = data2;
+    uint16_t crc = ModRTU_CRC(command,6);
+    command[6] = (crc >>8);
+    command[7] = (crc);
+}
 
+void Init(int file){
     struct termios options;
     tcgetattr(file, &options);
     // raw mode
@@ -51,154 +101,120 @@ int main(int argc, char *argv[]){
     options.c_cc[VMIN]=8;
     tcflush(file, TCIFLUSH);
     tcsetattr(file, TCSANOW, &options);
-    const size_t COMMAND_LEN = 8;
-    uint8_t command[COMMAND_LEN];
-    uint8_t receive[COMMAND_LEN];
+}
 
-    command[0] = atoi(argv[1]);
-    command[1] = atoi(argv[2]);
-    command[2] = (atoi(argv[3]) >> 8);
-    command[3] = (atoi(argv[3]));
-    command[4] = (atoi(argv[4]) >> 8);
-    command[5] = (atoi(argv[4]));
-    uint16_t crc = ModRTU_CRC(command,6);
-    command[6] = (crc >>8);
-    command[7] = (crc);
+void SentReq(){
+    printf("Sent request:");
+    for (int i = 0; i < 8; i++){
+        printf("%02x ", command[i]);
+    }
+    printf("\n");
+}
 
-    printf("Sent request: %02hhx",command[0]);
-    printf(" %02hhx",command[1]);
-    printf(" %02hhx",command[2]);
-    printf(" %02hhx",command[3]);
-    printf(" %02hhx",command[4]);
-    printf(" %02hhx",command[5]);
-    printf(" %02hhx",command[6]);
-    printf(" %02hhx\n",command[7]);
-
-    // //TESTS
-    // printf("test: %04hhx\n",(unsigned char)((command[2]<<8) + command[3]) );
-    // printf("test: %04hhx\n",(unsigned char)((command[4]<<8) + command[5]) );
-    // for(int i = 0; i < 15; i++){
-    lastServo0 = command[1];
+int Send(int file){
+    int count;
     // write 8 bytes
-    if ((count = write(file, command, COMMAND_LEN)<0)){
+    if ((count = write(file, command, 8)<0)){
         perror("Failed to write to the output\n");
         return -1;
     }
+}
 
+void Receive(int file){
+    int count;
+    // printf("FOKKING HATE THIS SHIT \n: ");
     if ((count = read(file, (void*)receive, COMMAND_LEN))<0){
         perror("Failed to read from the input\n");
-        return -1;
     }
-    // usleep(100000);
-    // print the response
+
+        // print the response
     if (count==0) printf("There was no data available to read!\n");
     else {
-        receive[count]=0;  //There is no null character sent by the Arduino
+        receive[count]='\0';  //There is no null character sent by the Arduino
         printf("Received reply: ");
         for (int i = 0; i < count; i++){
             printf("%02x ", receive[i]);
         }
-        printf("\n");
-    }
-    usleep(10000);
-    command[0] = 0x01;
-    command[1] = 0x06;
-    command[2] = 0x00;
-    command[3] = 0x06;
-    command[4] = receive[4];
-    command[5] = receive[5];
-    crc = ModRTU_CRC(command,6);
-    command[6] = (crc >>8);
-    command[7] = (crc);
-
-    printf("Sent request: %02hhx",command[0]);
-    printf(" %02hhx",command[1]);
-    printf(" %02hhx",command[2]);
-    printf(" %02hhx",command[3]);
-    printf(" %02hhx",command[4]);
-    printf(" %02hhx",command[5]);
-    printf(" %02hhx",command[6]);
-    printf(" %02hhx\n",command[7]);
-    // write 8 bytes
-    if ((count = write(file, command, COMMAND_LEN)<0)){
-        perror("Failed to write to the output\n");
-        return -1;
-    }
-
-    if ((count = read(file, (void*)receive, COMMAND_LEN))<0){
-        perror("Failed to read from the input\n");
-        return -1;
-    }
-    // print the response
-    if (count==0) printf("There was no data available to read!\n");
-    else {
-        receive[count]=0;  //There is no null character sent by the Arduino
-        printf("Received reply: ");
-        for (int i = 0; i < count; i++){
-            printf("%02x ", receive[i]);
-        }
-        printf("\n");
-
-    usleep(10000);
-    command[0] = 0x01;
-    command[1] = 0x06;
-    command[2] = (atoi(argv[3]) >> 8);
-    command[3] = (atoi(argv[3]));
-    command[4] = 0x00;
-    command[5] = 1;
-    crc = ModRTU_CRC(command,6);
-    command[6] = (crc >>8);
-    command[7] = (crc);
-            // write 8 bytes
-    printf("Sent request: %02hhx",command[0]);
-    printf(" %02hhx",command[1]);
-    printf(" %02hhx",command[2]);
-    printf(" %02hhx",command[3]);
-    printf(" %02hhx",command[4]);
-    printf(" %02hhx",command[5]);
-    printf(" %02hhx",command[6]);
-    printf(" %02hhx\n",command[7]);
-    if ((count = write(file, command, COMMAND_LEN)<0)){
-        perror("Failed to write to the output\n");
-        return -1;
-    }
-
-    if ((count = read(file, (void*)receive, COMMAND_LEN))<0){
-        perror("Failed to read from the input\n");
-        return -1;
-    }
-    usleep(10000);
-    // print the response
-    if (count==0) printf("There was no data available to read!\n");
-    else {
-        receive[count]=0;  //There is no null character sent by the Arduino
-        printf("Received reply: ");
-        for (int i = 0; i < count; i++){
-            printf("%02x ", receive[i]);
-        }
-        printf("\n");
         
-    }
-    // lastServo1 = command[1];
-        // if (command[0] == 1){
-        //     command[0] = 0;
-        //     if (command[1] == 3 && command[1] != lastservo1){
-        //         command[1] = 6;
-        //     }else{
-        //         command[1] = 6;
-        //     }
-        // }else{
-        //     command[0] = 1;
-        //     if (command[1] == 3 && command[1] != lastservo1){
-        //         command[1] = 6;
-        //     }else{
-        //         command[1] = 6;
-        //     }
-        // }
+        printf("\n");
 
+    }
+}
+
+
+int main(int argc, char *argv[]){
+
+    // if(argc!=5){
+    //     printf("Invalid number of arguments, exiting!\n");
+    //     return -2;
+    // }
+    int file,count;
+    uint16_t crc;
+    // const size_t COMMAND_LEN = 8;
+    // uint8_t command[COMMAND_LEN];
+    // uint8_t receive[COMMAND_LEN];
+    
+    if ((file = open("/dev/ttyS0", O_RDWR | O_NOCTTY ))<0){
+        perror("UART: Failed to open the file.\n");
+        return -1;
+    }
+
+
+    Init(file);
+
+    Preop(0x00);
+    SentReq();
+    Send(file);
+
+    Receive(file);
+
+    Preop(0x01);
+    SentReq();
+    Send(file);
+    Receive(file);
+
+    for(int i = 0; i < 1000; i++){
+
+        Read(0x00);
+        SentReq();
+        Send(file);
+        Receive(file);
+
+        Write(0x01,0x06,receive[4],receive[5]);
+        SentReq();
+        Send(file);
+        Receive(file);
+
+        Op(0x01);
+        SentReq();
+        Send(file);
+        Receive(file);
+        
+        Read(0x01);
+        SentReq();
+        Send(file);
+        Receive(file);
+
+        // SentReq();
+        // Send(file);
+        // Receive(file);
+
+        Write(0x00,0x06,receive[4],receive[5]);
+        SentReq();
+        Send(file);
+        Receive(file);
+
+        // SentReq();
+        // Send(file);
+        // Receive(file);
+
+        Op(0x00);
+        SentReq();
+        Send(file);
+        Receive(file);
         usleep(10000);
-    }
 
+    }
     close(file);
     return 0;
 }
