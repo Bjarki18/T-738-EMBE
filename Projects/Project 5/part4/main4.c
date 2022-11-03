@@ -132,6 +132,19 @@ void Op(uint8_t servernum){
     // Send();
 }
 
+void Stop(uint8_t servernum){
+    command[0] = servernum;
+    command[1] = 0x06;
+    command[2] = 0x00;
+    command[3] = 0x00;
+    command[4] = 0x00;
+    command[5] = 0x02;
+    uint16_t crc = ModRTU_CRC(command,6);
+    command[6] = (crc >>8);
+    command[7] = (crc);
+    // Send();
+}
+
 void ReadPot( uint8_t servernum){
     command[0] = servernum;
     command[1] = 0x03;
@@ -257,7 +270,7 @@ int main(int argc, char *argv[]){
     Send(file);
     Receive(file);
 
-    for(int i = 0; i < 1000; i++){
+    for(int i = 0; i < 100; i++){
 
         ReadPot(0x00);
         SentReq();
@@ -340,7 +353,13 @@ int main(int argc, char *argv[]){
 
         usleep(10000);
     }
-    Write(0x01,0x06,(pwm>>8),pwm);
+    //
+    Stop(0x00);
+    SentReq();
+    Send(file);
+    Receive(file);
+
+    Stop(0x01);
     SentReq();
     Send(file);
     Receive(file);
