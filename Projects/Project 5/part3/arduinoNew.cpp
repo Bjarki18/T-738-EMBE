@@ -71,20 +71,19 @@ void statemachine(uint16_t state, uint16_t regist){
   switch (state)
   {
     case SET_PREOP:
-      if (lastState != SET_PREOP)
-      {
-        digitalWrite(Motor1,LOW);
-        digitalWrite(Motor2,HIGH);
-        lastState = SET_PREOP;
-      }
+      digitalWrite(Motor1,LOW);
+      digitalWrite(Motor2,HIGH);
+      lastState = SET_PREOP;
+
       break;
     case SET_OP:
       if (lastState != SET_OP)
       {
         // TIMSK1 &= ~(1<<OCIE1A);
+        digitalWrite(ledPin,HIGH);
         digitalWrite(Motor1,LOW);
         digitalWrite(Motor2,HIGH);
-        analogWrite(PWM,(registers[regist])/4);
+        analogWrite(PWM,map(registers[regist],0,1023,0,255));
         //controller.go();
         lastState = SET_OP;
       }
