@@ -6,6 +6,14 @@
 #define RESET_NODE 0x81
 #define RESET_COMMS 0x82
 
+#define readA bitRead(PIND,2)//faster than digitalRead()
+#define readB bitRead(PIND,3)//faster than digitalRead()
+
+const byte encoderPinA = 2;//outputA digital pin2
+const byte encoderPinB = 3;//outoutB digital pin3
+volatile int count = 0;
+int speed_value = 0;
+
 
 
 int ledPin = 11;          // LED with PWM brightness control
@@ -18,15 +26,55 @@ int ThermistorPin = A0;
 uint8_t lastState = 0;
 
 
+void isrA() {
+  if(readB != readA) {
+    count ++;
+  } else {
+    count --;
+  }
+}
+void isrB() {
+  if (readA == readB) {
+    count ++;
+  } else {
+    count --;
+  }
+}
+
+void timer_msec(int period_ms){
+    // this code sets up timer1 for a 1ms @ 16Mhz Clock (mode 4)
+    // Counting 16000/8 cycles of a clock prescaled by 8
+    TCCR2A = 0; // set timer1 to normal operation (all bits in control registers A and B set to zero)
+    TCCR2B = 0;
+    TCNT2 = 0; // initialize counter value to 0
+    OCR2A = (period_ms * 16000.0/1024 - 1); // assign target count to compare register A (must be less than 256)
+    TCCR2A |= (1 << WGM21); // clear the timer on compare match A
+    TIMSK2 |= (1 << OCIE2A); // set interrupt on compare match A
+    TCCR2B |= (1 << CS22) | (1 << CS21) | (1 << CS20); // set prescaler to 1024 and start the timer
+}
+
+
+ISR(TIMER2_COMPA_vect)
+{
+	speed_value = (1000.0*count)/(10*1.0); // pulses
+  count = 0;
+}
+
+
 void setup() {            // called once on start up
   // A baud rate of 115200 (8-bit with No parity and 1 stop bit)
   Serial.begin(115200, SERIAL_8N1);
+  interrupts();
   pinMode(ledPin, OUTPUT);         // the LED is an output
   pinMode(ThermistorPin,INPUT);
   pinMode(Motor1,OUTPUT);
   pinMode(Motor2,OUTPUT);
+  pinMode(encoderPinA, INPUT_PULLUP);
+  pinMode(encoderPinB, INPUT_PULLUP);
   pinMode(PWM,OUTPUT);
-
+  timer_msec(10);
+  attachInterrupt(digitalPinToInterrupt(encoderPinA), isrA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(encoderPinB), isrB, CHANGE);
 }
 
 // Compute the MODBUS RTU CRC
@@ -109,21 +157,23 @@ void loop() {
             buffer[1] = command[1];
             buffer[2] = command[2];
             buffer[3] = command[3];
-            uint16_t signal = analogRead(ThermistorPin);
-            uint8_t data1 = signal>>8;
-            uint8_t data2 = signal;
-            buffer[4] = data1;
-            buffer[5] = data2;
-            lastState = data;
-            registers[regis] = signal;
-            // if (regis == 0){
-            //   //statemachine(data,regis);
-            // }else{
-            //   uint8_t data1 = registers[regis]>>8;
-            //   uint8_t data2 = registers[regis];
-            //   buffer[4] = data1;
-            //   buffer[5] = data2;
-            // }
+            if(regis == 1){
+              uint16_t signal = map(speed_value,0,5600,0,1023);
+              uint8_t data1 = signal>>8;
+              uint8_t data2 = signal;
+              buffer[4] = data1;
+              buffer[5] = data2;
+              lastState = data;
+              registers[regis] = signal;
+            }else if(regis == 6){
+              uint16_t signal = analogRead(ThermistorPin);
+              uint8_t data1 = signal>>8;
+              uint8_t data2 = signal;
+              buffer[4] = data1;
+              buffer[5] = data2;
+              lastState = data;
+              registers[regis] = signal;
+            }
             uint16_t crc_update = ModRTU_CRC(buffer,6);
             buffer[6] = (crc_update >>8);
             buffer[7] = crc_update;
@@ -154,3 +204,8 @@ void loop() {
     }
   } 
 }
+
+
+
+
+
