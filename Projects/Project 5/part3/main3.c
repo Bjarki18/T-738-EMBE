@@ -141,6 +141,19 @@ void Receive(int file){
     }
 }
 
+void Stop(uint8_t servernum){
+    command[0] = servernum;
+    command[1] = 0x06;
+    command[2] = 0x00;
+    command[3] = 0x00;
+    command[4] = 0x00;
+    command[5] = 0x02;
+    uint16_t crc = ModRTU_CRC(command,6);
+    command[6] = (crc >>8);
+    command[7] = (crc);
+    // Send();
+}
+
 
 int main(int argc, char *argv[]){
 
@@ -195,29 +208,28 @@ int main(int argc, char *argv[]){
         Send(file);
         Receive(file);
 
-        // SentReq();
-        // Send(file);
-        // Receive(file);
 
         Write(0x00,0x06,receive[4],receive[5]);
         SentReq();
         Send(file);
         Receive(file);
 
-        // SentReq();
-        // Send(file);
-        // Receive(file);
 
         Op(0x00);
         SentReq();
         Send(file);
         Receive(file);
         usleep(10000);
-
     }
+    Stop(0x00);
+    SentReq();
+    Send(file);
+    Receive(file);
+
+    Stop(0x01);
+    SentReq();
+    Send(file);
+    Receive(file);
     close(file);
     return 0;
 }
-
-
-
